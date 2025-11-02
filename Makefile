@@ -23,7 +23,9 @@ build-fast: ## Build the project without running tests (faster)
 	$(GRADLE) build -x test
 
 test: ## Run all tests
-	$(GRADLE) test
+	$(GRADLE) test --console=plain
+
+clean-test: clean test ## Clean and run all tests with full logs
 
 clean: ## Clean build directory
 	$(GRADLE) clean
