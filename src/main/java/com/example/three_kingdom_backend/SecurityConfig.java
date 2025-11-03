@@ -1,31 +1,34 @@
 package com.example.three_kingdom_backend;
 
 import com.example.three_kingdom_backend.auth.JwtAuthenticationFilter;
+import com.example.three_kingdom_backend.auth.LogoutService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final UserDetailsService userDetailsService;
-
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, UserDetailsService userDetailsService) {
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-        this.userDetailsService = userDetailsService;
-    }
+    private final LogoutHandler logoutHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -33,23 +36,36 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager() {
+    public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
-        return new ProviderManager(authProvider);
+        return authProvider;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager() {
+        return new ProviderManager(authenticationProvider());
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(
+                        (sessionManagement) -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
+                        .requestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/refresh").permitAll()
+                        .requestMatchers("/api/auth/logout").authenticated()
                         .requestMatchers("/api/hello").permitAll()
                         .anyRequest().authenticated())
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .logout((logout) -> logout
+                        .logoutUrl("/api/auth/logout")
+                        .addLogoutHandler(logoutHandler)
+                        .logoutSuccessHandler(
+                                (request, response, authentication) -> SecurityContextHolder.clearContext()));
 
         return http.build();
     }
