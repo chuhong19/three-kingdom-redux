@@ -24,6 +24,9 @@ class UserServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+
     @InjectMocks
     private UserService userService;
 
@@ -43,6 +46,7 @@ class UserServiceTest {
         // Given
         when(userRepository.findByUsername("testuser")).thenReturn(Optional.empty());
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.empty());
+        when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(user);
 
         // When
@@ -144,6 +148,7 @@ class UserServiceTest {
         // Given
         when(userRepository.findByUsername("testuser")).thenReturn(Optional.empty());
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.empty());
+        when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(user);
 
         // When
@@ -152,6 +157,7 @@ class UserServiceTest {
         // Then
         verify(userRepository, times(1)).save(argThat(u -> u.getUsername().equals("testuser") &&
                 u.getEmail().equals("test@example.com") &&
-                u.getPassword().equals("password123")));
+                u.getPassword().equals("encodedPassword")));
+        verify(passwordEncoder, times(1)).encode("password123");
     }
 }
