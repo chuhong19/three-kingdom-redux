@@ -1,4 +1,4 @@
-package com.example.three_kingdom_backend.auth;
+package com.example.three_kingdom_backend.config.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

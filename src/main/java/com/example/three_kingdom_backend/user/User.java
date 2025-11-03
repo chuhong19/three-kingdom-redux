@@ -1,5 +1,6 @@
 package com.example.three_kingdom_backend.user;
 
+import com.example.three_kingdom_backend.util.Auditable;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
@@ -13,7 +14,7 @@ import lombok.EqualsAndHashCode;
 @Table(name = "users")
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class UserEntity extends Auditable {
+public class User extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

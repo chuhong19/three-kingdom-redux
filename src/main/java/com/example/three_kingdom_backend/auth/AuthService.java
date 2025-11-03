@@ -1,6 +1,8 @@
 package com.example.three_kingdom_backend.auth;
 
-import com.example.three_kingdom_backend.user.UserEntity;
+import com.example.three_kingdom_backend.config.security.JwtService;
+import com.example.three_kingdom_backend.config.security.CustomUserDetailsService;
+import com.example.three_kingdom_backend.user.User;
 import com.example.three_kingdom_backend.user.UserService;
 import com.example.three_kingdom_backend.util.response.StandardResponse;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,11 +29,11 @@ public class AuthService {
     }
 
     public StandardResponse<String> register(RegisterRequest request) {
-        UserEntity userEntity = new UserEntity();
-        userEntity.setUsername(request.getUsername());
-        userEntity.setEmail(request.getEmail());
-        userEntity.setPassword(request.getPassword());
-        return userService.createUser(userEntity);
+        User user = new User();
+        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
+        user.setPassword(request.getPassword());
+        return userService.createUser(user);
     }
 
     public StandardResponse<AuthResponse> login(LoginRequest loginRequest) {

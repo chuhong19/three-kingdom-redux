@@ -24,17 +24,20 @@ class UserServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+
     @InjectMocks
     private UserService userService;
 
-    private UserEntity userEntity;
+    private User user;
 
     @BeforeEach
     void setUp() {
-        userEntity = new UserEntity();
-        userEntity.setUsername("testuser");
-        userEntity.setEmail("test@example.com");
-        userEntity.setPassword("password123");
+        user = new User();
+        user.setUsername("testuser");
+        user.setEmail("test@example.com");
+        user.setPassword("password123");
     }
 
     @Test
@@ -43,10 +46,11 @@ class UserServiceTest {
         // Given
         when(userRepository.findByUsername("testuser")).thenReturn(Optional.empty());
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.empty());
-        when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
+        when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
+        when(userRepository.save(any(User.class))).thenReturn(user);
 
         // When
-        StandardResponse<String> response = userService.createUser(userEntity);
+        StandardResponse<String> response = userService.createUser(user);
 
         // Then
         assertThat(response).isNotNull();
@@ -56,19 +60,19 @@ class UserServiceTest {
 
         verify(userRepository, times(1)).findByUsername("testuser");
         verify(userRepository, times(1)).findByEmail("test@example.com");
-        verify(userRepository, times(1)).save(userEntity);
+        verify(userRepository, times(1)).save(user);
     }
 
     @Test
     @DisplayName("Create user fails when username already exists")
     void testCreateUser_UsernameAlreadyExists() {
         // Given
-        UserEntity existingUser = new UserEntity();
+        User existingUser = new User();
         existingUser.setUsername("testuser");
         when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(existingUser));
 
         // When
-        StandardResponse<String> response = userService.createUser(userEntity);
+        StandardResponse<String> response = userService.createUser(user);
 
         // Then
         assertThat(response).isNotNull();
@@ -78,7 +82,7 @@ class UserServiceTest {
 
         verify(userRepository, times(1)).findByUsername("testuser");
         verify(userRepository, never()).findByEmail(anyString());
-        verify(userRepository, never()).save(any(UserEntity.class));
+        verify(userRepository, never()).save(any(User.class));
     }
 
     @Test
@@ -87,12 +91,12 @@ class UserServiceTest {
         // Given
         when(userRepository.findByUsername("testuser")).thenReturn(Optional.empty());
 
-        UserEntity existingUser = new UserEntity();
+        User existingUser = new User();
         existingUser.setEmail("test@example.com");
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(existingUser));
 
         // When
-        StandardResponse<String> response = userService.createUser(userEntity);
+        StandardResponse<String> response = userService.createUser(user);
 
         // Then
         assertThat(response).isNotNull();
@@ -102,17 +106,17 @@ class UserServiceTest {
 
         verify(userRepository, times(1)).findByUsername("testuser");
         verify(userRepository, times(1)).findByEmail("test@example.com");
-        verify(userRepository, never()).save(any(UserEntity.class));
+        verify(userRepository, never()).save(any(User.class));
     }
 
     @Test
     @DisplayName("Get user by username successfully")
     void testGetUserByUsername_Success() {
         // Given
-        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(userEntity));
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
 
         // When
-        UserEntity result = userService.getUserByUsername("testuser");
+        User result = userService.getUserByUsername("testuser");
 
         // Then
         assertThat(result).isNotNull();
@@ -144,14 +148,16 @@ class UserServiceTest {
         // Given
         when(userRepository.findByUsername("testuser")).thenReturn(Optional.empty());
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.empty());
-        when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
+        when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
+        when(userRepository.save(any(User.class))).thenReturn(user);
 
         // When
-        userService.createUser(userEntity);
+        userService.createUser(user);
 
         // Then
-        verify(userRepository, times(1)).save(argThat(user -> user.getUsername().equals("testuser") &&
-                user.getEmail().equals("test@example.com") &&
-                user.getPassword().equals("password123")));
+        verify(userRepository, times(1)).save(argThat(u -> u.getUsername().equals("testuser") &&
+                u.getEmail().equals("test@example.com") &&
+                u.getPassword().equals("encodedPassword")));
+        verify(passwordEncoder, times(1)).encode("password123");
     }
 }

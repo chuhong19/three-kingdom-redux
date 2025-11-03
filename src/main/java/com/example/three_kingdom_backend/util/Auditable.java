@@ -1,4 +1,4 @@
-package com.example.three_kingdom_backend.user;
+package com.example.three_kingdom_backend.util;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
