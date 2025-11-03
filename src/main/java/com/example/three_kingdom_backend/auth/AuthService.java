@@ -26,8 +26,12 @@ public class AuthService {
         this.authenticationManager = authenticationManager;
     }
 
-    public StandardResponse<String> register(UserEntity data) {
-        return userService.createUser(data);
+    public StandardResponse<String> register(RegisterRequest request) {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setUsername(request.getUsername());
+        userEntity.setEmail(request.getEmail());
+        userEntity.setPassword(request.getPassword());
+        return userService.createUser(userEntity);
     }
 
     public StandardResponse<AuthResponse> login(LoginRequest loginRequest) {
