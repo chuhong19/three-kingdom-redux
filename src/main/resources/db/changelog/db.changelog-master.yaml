@@ -9,4 +9,10 @@ databaseChangeLog:
       file: db/changelog/changes/004-drop-refresh-tokens-table.sql
   - include:
       file: db/changelog/changes/005-create-password-reset-otp-table.sql
+  - include:
+      file: db/changelog/changes/006-create-room-table.sql
+  - include:
+      file: db/changelog/changes/007-create-room-members-table.sql
+  - include:
+      file: db/changelog/changes/008-allow-null-description-password-rooms.sql
 
