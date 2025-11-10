@@ -25,4 +25,6 @@ databaseChangeLog:
       file: db/changelog/changes/012-set-tx-id-default-sequence.sql
   - include:
       file: db/changelog/changes/013-complete-tx-id-sequence-setup.sql
+  - include:
+      file: db/changelog/changes/014-set-match-event-tx-default.sql
 

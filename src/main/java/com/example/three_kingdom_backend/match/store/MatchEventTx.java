@@ -5,6 +5,8 @@ import com.example.three_kingdom_backend.util.Auditable;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.GenerationTime;
 
 @Entity
 @Table(name = "match_event_tx", indexes = {
@@ -26,7 +28,8 @@ public class MatchEventTx extends Auditable {
         @Column(name = "match_id", nullable = false)
         private Long matchId;
 
-        @Column(name = "tx_id", nullable = false)
+        @Column(name = "tx_id", nullable = false, insertable = false, updatable = false)
+        @Generated(GenerationTime.INSERT)
         private Long txId; // dùng sequence trong DB cho chuẩn
 
         @Column(name = "command_type", nullable = false, length = 64)

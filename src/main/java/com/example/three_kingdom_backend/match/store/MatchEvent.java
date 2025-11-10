@@ -4,6 +4,8 @@ import com.example.three_kingdom_backend.util.Auditable;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "match_events", indexes = {
@@ -31,5 +33,6 @@ public class MatchEvent extends Auditable {
     private String type;
 
     @Column(name = "payload_jsonb", columnDefinition = "jsonb", nullable = false)
+    @JdbcTypeCode(SqlTypes.JSON)
     private String payloadJson; // đặt tên rõ payloadJson
 }
