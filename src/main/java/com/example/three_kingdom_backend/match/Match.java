@@ -1,7 +1,7 @@
 package com.example.three_kingdom_backend.match;
 
 import com.example.three_kingdom_backend.match.enums.MatchStatus;
-import com.example.three_kingdom_backend.match.enums.PlayerFaction;
+import com.example.three_kingdom_backend.match.enums.EnumKingdom;
 import com.example.three_kingdom_backend.room.Room;
 import com.example.three_kingdom_backend.user.User;
 import com.example.three_kingdom_backend.util.Auditable;
@@ -56,7 +56,7 @@ public class Match extends Auditable {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "current_turn", length = 10)
-    private PlayerFaction currentTurn;
+    private EnumKingdom currentTurn;
 
     @Column(name = "is_wei_turn", nullable = false)
     private boolean isWeiTurn;

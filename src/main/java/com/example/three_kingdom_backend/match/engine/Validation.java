@@ -1,7 +1,6 @@
 package com.example.three_kingdom_backend.match.engine;
 
 import com.example.three_kingdom_backend.match.enums.EnumKingdom;
-import com.example.three_kingdom_backend.match.enums.PlayerFaction;
 
 public final class Validation {
     private Validation() {
@@ -20,17 +19,11 @@ public final class Validation {
     }
 
     public static void ensureTurn(MatchAggregate agg, EnumKingdom actor) {
-        PlayerFaction currentTurn = agg.header().getCurrentTurn();
+        EnumKingdom currentTurn = agg.header().getCurrentTurn();
         if (currentTurn == null) {
             throw new IllegalStateException("No current turn set");
         }
-        // Convert EnumKingdom to PlayerFaction for comparison
-        PlayerFaction expectedTurn = switch (actor) {
-            case WEI -> PlayerFaction.WEI;
-            case SHU -> PlayerFaction.SHU;
-            case WU -> PlayerFaction.WU;
-        };
-        if (currentTurn != expectedTurn) {
+        if (currentTurn != actor) {
             throw new IllegalStateException("Not your turn");
         }
     }
