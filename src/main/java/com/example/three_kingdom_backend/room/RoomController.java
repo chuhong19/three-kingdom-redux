@@ -30,14 +30,23 @@ public class RoomController {
     @PostMapping("/join/{roomId}")
     public StandardResponse<RoomDTO> joinRoom(
             @PathVariable Long roomId,
-            @RequestBody JoinRoomRequest request,
+            @RequestBody(required = false) JoinRoomRequest request,
             @AuthenticationPrincipal AuthUser me) {
-        return roomService.joinRoom(roomId, request.getPassword(), me.getId());
+        String password = request != null ? request.getPassword() : null;
+        return roomService.joinRoom(roomId, password, me.getId());
     }
 
     @PostMapping("/leave/{roomId}")
     public StandardResponse<RoomDTO> leaveRoom(@PathVariable Long roomId,
             @AuthenticationPrincipal AuthUser me) {
         return roomService.leaveRoom(roomId, me.getId());
+    }
+
+    @PostMapping("/start/{roomId}")
+    public StandardResponse<RoomDTO> startGame(@PathVariable Long roomId,
+            @RequestBody StartGameRequest request,
+            @AuthenticationPrincipal AuthUser me) {
+        return roomService.startGame(roomId, me.getId(), request.getWeiPlayerId(), request.getShuPlayerId(),
+                request.getWuPlayerId());
     }
 }
